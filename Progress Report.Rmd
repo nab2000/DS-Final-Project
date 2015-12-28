@@ -4,17 +4,70 @@ author: "Nick Rose"
 date: "December 28, 2015"
 output: html_document
 ---
-
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+                      
 The goal of the Data Science Capstone project is to develop a predictive algorithm that will predict the next word in a sentence given three other words. Files containing selections of twitter, news, and blog text are being utilzied to devleop this algorithm. As a first step in this process, these files were examined to get a better understanding of the data to design the best possible algorithm 
 
 ```{r, echo = F, cache = T}
 library(stringr)
-library(NLP)
-library(openNLP)
-library(magrittr)
+
 blog <- readLines("./final/en_US/en_US.blogs.txt")
 news <- readLines("./final/en_US/en_US.news.txt")
 twitter <- readLines("./final/en_US/en_US.twitter.txt")
+newsno <- length(news)
+blogno <- length(blog)
+twitterno <- length(twitter)
 ```
 
-The first step in this report is to process the data so that it is in a shape we cna work with. First, all of the punctuation was removed from the sentences. 
+ The The first step in this report is to process the data so that it is in a shape we can work with. First, all of the punctuation was removed from the sentences.
+
+```{r, echo = F, cache = T}
+news <- gsub("\\.", "", news)
+news <- gsub("\\,", "", news)
+news <- gsub("\\?", "", news)
+news <- gsub("\\!", "", news)
+news <- gsub("\\'", "", news)
+blog <- gsub("\\.", "", blog)
+blog <- gsub("\\,", "", blog)
+blog <- gsub("\\?", "", blog)
+blog <- gsub("\\!", "", blog)
+blog <- gsub("\\'", "", blog)
+twitter <- gsub("\\.", "", twitter)
+twitter <- gsub("\\,", "", twitter)
+twitter <- gsub("\\?", "", twitter)
+twitter <- gsub("\\!", "", twitter)
+twitter <- gsub("\\'", "", twitter)
+```
+
+With the data properly formatted, basic characteristics of the datasets were examined. The number of distinct entries for the datasets were `r prettyNum(newsno, big.mark = ",")` for news, `r prettyNum(blogno, big.mark = ",")` for blogs, and `r prettyNum(twitterno, big.mark = ",")` for the twitter data.
+
+```{r, echo = F, cache = T}
+news_list <- strsplit(news, " ")
+blog_list <- strsplit(blog, " ")
+twitter_list <- strsplit(twitter, " ")
+
+
+news_nos <- as.numeric(summary(news_list)[,1])
+blog_nos <- as.numeric(summary(blog_list)[,1])
+twitter_nos <- as.numeric(summary(twitter_list)[,1])
+
+news_total <- sum(news_nos)
+blog_total <- sum(blog_nos)
+twitter_total <- sum(twitter_nos)
+```
+
+The average number of words per entry for each of the three datasets are `r round(news_total/newsno,2) ` (news), `r round(blog_total/blogno, 2) `, (blogs), and `r round(twitter_total/twitterno, 2) `. As you can see from the data, the twitter entries have the shortest number of words per entry, which is not surprising given the character constraints. While blogs have the longest number of words per entry. Histograms were generated to see what the distribution of words be entry was for each of the different datasets. 
+
+```{r, echo = F}
+library(ggplot2)
+qplot(log(news_nos, base = 10), geom = "histogram", xlab = "Number of Words (log)", main = "News data Set")
+
+
+qplot(log(blog_nos, base = 10), geom = "histogram", xlab = "Number of Words (log)", main = "Blog data Set")
+
+qplot(twitter_nos, geom = "histogram", xlab = "Number of Words", main = "Twitter data Set")
+
+```
+
