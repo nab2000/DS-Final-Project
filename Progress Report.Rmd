@@ -1,0 +1,20 @@
+---
+title: "Progress Report"
+author: "Nick Rose"
+date: "December 28, 2015"
+output: html_document
+---
+
+The goal of the Data Science Capstone project is to develop a predictive algorithm that will predict the next word in a sentence given three other words. Files containing selections of twitter, news, and blog text are being utilzied to devleop this algorithm. As a first step in this process, these files were examined to get a better understanding of the data to design the best possible algorithm 
+
+```{r, echo = F, cache = T}
+library(stringr)
+library(NLP)
+library(openNLP)
+library(magrittr)
+blog <- readLines("./final/en_US/en_US.blogs.txt")
+news <- readLines("./final/en_US/en_US.news.txt")
+twitter <- readLines("./final/en_US/en_US.twitter.txt")
+```
+
+The first step in this report is to process the data so that it is in a shape we cna work with. First, all of the punctuation was removed from the sentences. 
