@@ -63,11 +63,19 @@ The average number of words per entry for each of the three datasets are `r roun
 ```{r, echo = F}
 library(ggplot2)
 qplot(log(news_nos, base = 10), geom = "histogram", xlab = "Number of Words (log)", main = "News data Set")
+```
 
+The histogram of the News dataset shows a Log(10) normal distribution of the number of words per entry. This shows that most stories are close to the average of `r round(news_total/newsno,2) ` but that there are entries with very few and large number of words. 
 
+``` {r, echo = F}
 qplot(log(blog_nos, base = 10), geom = "histogram", xlab = "Number of Words (log)", main = "Blog data Set")
+```
 
+The dataset for the blogs are similar to that for the News dataset. However, it appears that there may be two distinct peaks, suggesting a cluster of short and long blogs. 
+
+```{r, echo = F}
 qplot(twitter_nos, geom = "histogram", xlab = "Number of Words", main = "Twitter data Set")
 
 ```
 
+Not surprising, the Twitter words per entry distribution is exponential, with lots of small word entries and few logner word entries. This is likely due to the character requirement. Overall, these three datasets represent very different types of writing with different distributions in their word count. This means that these datasets are likely to provide unique and distinct word combinations that will be useful in developing a more robust algorithm. 
