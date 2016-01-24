@@ -8,7 +8,7 @@ output: html_document
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 ```
                       
-The goal of the Data Science Capstone project is to develop a predictive algorithm that will predict the next word in a sentence given three other words. Files containing selections of twitter, news, and blog text are being utilzied to devleop this algorithm. As a first step in this process, these files were examined to get a better understanding of the data to design the best possible algorithm 
+The goal of the Data Science Capstone project is to develop a predictive algorithm that will predict the next word in a sentence given three other words. Files containing selections of twitter, news, and blog entries are being utilzied to devleop this algorithm. As a first step in this process, these files were examined to get a better understanding of the data to design the best possible algorithm. The The first step in this report is to process the data so that it is in a shape we can work with. First, all of the punctuation was removed from the sentences. 
 
 ```{r, echo = F, cache = T}
 library(stringr)
@@ -21,7 +21,6 @@ blogno <- length(blog)
 twitterno <- length(twitter)
 ```
 
- The The first step in this report is to process the data so that it is in a shape we can work with. First, all of the punctuation was removed from the sentences.
 
 ```{r, echo = F, cache = T}
 news <- gsub("\\.", "", news)
@@ -41,7 +40,7 @@ twitter <- gsub("\\!", "", twitter)
 twitter <- gsub("\\'", "", twitter)
 ```
 
-With the data properly formatted, basic characteristics of the datasets were examined. The number of distinct entries for the datasets were `r prettyNum(newsno, big.mark = ",")` for news, `r prettyNum(blogno, big.mark = ",")` for blogs, and `r prettyNum(twitterno, big.mark = ",")` for the twitter data.
+With the data properly formatted, basic characteristics of the datasets were examined. The number of distinct entries (lines) for the datasets were `r prettyNum(newsno, big.mark = ",")` for news, `r prettyNum(blogno, big.mark = ",")` for blogs, and `r prettyNum(twitterno, big.mark = ",")` for the twitter data.
 
 ```{r, echo = F, cache = T}
 news_list <- strsplit(news, " ")
@@ -58,7 +57,9 @@ blog_total <- sum(blog_nos)
 twitter_total <- sum(twitter_nos)
 ```
 
-The average number of words per entry for each of the three datasets are `r round(news_total/newsno,2) ` (news), `r round(blog_total/blogno, 2) `, (blogs), and `r round(twitter_total/twitterno, 2) `. As you can see from the data, the twitter entries have the shortest number of words per entry, which is not surprising given the character constraints. While blogs have the longest number of words per entry. Histograms were generated to see what the distribution of words be entry was for each of the different datasets. 
+The average number of words per entry for each of the three datasets are `r round(news_total/newsno,2) ` (news), `r round(blog_total/blogno, 2) `, (blogs), and `r round(twitter_total/twitterno, 2) `. As you can see from the data, the twitter entries have the shortest number of words per entry, which is not surprising given the character constraints. Blogs have the longest number of words per entry. 
+
+Histograms were generated to examine the distribution of words per entry for each of the different datasets. 
 
 ```{r, echo = F}
 library(ggplot2)
@@ -78,4 +79,4 @@ qplot(twitter_nos, geom = "histogram", xlab = "Number of Words", main = "Twitter
 
 ```
 
-Not surprising, the Twitter words per entry distribution is exponential, with lots of small word entries and few logner word entries. This is likely due to the character requirement. Overall, these three datasets represent very different types of writing with different distributions in their word count. This means that these datasets are likely to provide unique and distinct word combinations that will be useful in developing a more robust algorithm. 
+Not surprising, the Twitter words per entry distribution is exponential, with lots of small word entries and few logner word entries. This is likely due to the character requirement of the platform. Overall, these three datasets represent very different types of writing with different distributions in their word count. Thus, they are likely to provide unique and distinct word combinations that will be useful in developing a robust algorithm. 

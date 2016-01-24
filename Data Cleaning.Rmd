@@ -1,0 +1,82 @@
+---
+title: "Final Project Data Cleaning and Analysis"
+author: "NDR"
+date: "January 6, 2016"
+output: html_document
+---
+
+This R Markdown document describes the process that was utilized to clean the data and prepare it for analysis for my final project in the Coursera-John Hopkins Data Science Certification. The goal of this project was to build a Shiny App that could take in words and predict the next word. 
+
+The following packages were utilized and the seed was set to ensure reproducibility
+```{r}
+library(tm)
+library(stringr)
+library(openNLP)
+library(RWeka)
+set.seed(8563)
+```
+
+Next all of the US text files, which were obtained from HC Corpa (www.corpora.heliohost.org) were loaded into R and 1% of the entries were sampled from the twitter, news, and blog datasets to obtain a training data set. 
+```{r, cache = T}
+blog <- readLines("./final/en_US/en_US.blogs.txt")
+news <- readLines("./final/en_US/en_US.news.txt")
+twitter <- readLines("./final/en_US/en_US.twitter.txt")
+train_data <- c(sample(blog, length(blog)*.01), sample (news, length(news)*.01), sample(twitter, length(twitter)*.01))
+rm(blog, news, twitter)
+
+```
+
+Following the development of a training dataset the the tm package was used to clean the data by removing numbers, punctutations and stopwords. To ensure a cleaner dataset, all the letters were lowercased and extra spaces were removed. 
+```{r, cache = T}
+train_data <- tolower(train_data)
+trn_data <- Corpus(VectorSource(list(train_data)))
+trn_data <- tm_map(trn_data, removeNumbers)
+trn_data <- tm_map(trn_data, removePunctuation)
+trn_data <- tm_map(trn_data, stripWhitespace)
+trn_data <- tm_map(trn_data, removeWords, stopwords("english"))
+rm(train_data)
+```
+
+The cleaned data was then converted into N-grams of lenght 1, 2, 3, and 4 words using the RWeka and OpenNLP tools. The 2-, 3-, and 4-grams were then split by word and turned into data tables with each word in it's own column. For the 1-gram, the call to table was used to generate a table comparing individual words and frequency. These tables were all save for use in algorithim generation  
+```{r}
+trn_tk1 <- NGramTokenizer(trn_data, Weka_control(min = 1, max = 1,delimiters = " \\r\\n\\t.,;:\"()?!"))
+trn_tk2 <- NGramTokenizer(trn_data, Weka_control(min = 2, max = 2, delimiters = " \\r\\n\\t.,;:\"()?!"))
+trn_tk3 <- NGramTokenizer(trn_data, Weka_control(min = 3, max = 3, delimiters = " \\r\\n\\t.,;:\"()?!"))
+trn_tk4 <- NGramTokenizer(trn_data, Weka_control(min = 4, max = 4, delimiters = " \\r\\n\\t.,;:\"()?!"))
+
+trn_tk2 <- strsplit(trn_tk2, " " , fixed = T)
+trn_tk3 <- strsplit(trn_tk3, " " , fixed = T)
+trn_tk4 <- strsplit(trn_tk4, " " , fixed = T)
+
+unigram <- data.frame(var_one = NA, outcome = NA)
+for (i in 1:length(trn_tk2)) { 
+        unigram[i, 1] <- trn_tk2[[i]][1]
+        unigram[i, 2] <- trn_tk2[[i]][2]
+}
+
+duogram <- data.frame(var_one = NA, var_two = NA, outcome = NA)
+for (i in 1:length(trn_tk3)) { 
+        duogram[i, 1] <- trn_tk3[[i]][1]
+        duogram[i, 2] <- trn_tk3[[i]][2]
+        duogram[i, 3] <- trn_tk3[[i]][3]
+}
+
+trigram <- data.frame(var_one = NA, var_two = NA, var_three = NA, outcome = NA)
+for (i in 1:length(trn_tk4)) { 
+        trigram[i, 1] <- trn_tk4[[i]][1]
+        trigram[i, 2] <- trn_tk4[[i]][2]
+        trigram[i, 3] <- trn_tk4[[i]][3]
+        trigram[i, 4] <- trn_tk4[[i]][4]
+}
+
+write.csv(unigram, file = "unigram.csv")
+write.csv(duogram, file = "duogram.csv")
+write.csv(trigram, file = "trigram.csv")
+save(trn_data, file = "Trn_Corpus.rda")
+
+uni_sort <- data.frame(table(trn_tk1))
+uni_sort <- uni_sort[order(uni_sort$Freq, decreasing = T),]
+write.csv(uni_sort, file = "single_word.csv")
+```
+
+

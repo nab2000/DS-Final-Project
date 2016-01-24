@@ -1,0 +1,114 @@
+---
+title: "Algorithm Development Final Project"
+author: "NDR"
+date: "January 10, 2016"
+output: html_document
+---
+
+Dictionary Generation 
+
+To Generate a dictionary for this process, the 1-grams were taken and all the words that appeared more than once were incorporated into our dictionary
+
+```{r}
+dict <- read.csv("single_word.csv")
+dict <- dict[, 2:3]
+dict <- dict[dict$Freq != 1, ]
+dict <- dict[, 1]
+dict <- as.character(dict)
+dict_len <- length(dict)
+```
+
+This produces a dictionary with `r dict_len` words in it. The dictionary was used to remove less common words and develop N-grams that take into consideration words that were not found in our training dataset. To do this, the 2-, 3- , and 4-grams data tables were scanned for words not in our dictionary, which were then turned into "<UKN>".  
+
+```{r}
+tri <- read.csv("trigram.csv", stringsAsFactors=FALSE)
+tri <- tri[,2:5]
+for (i in 1:length(tri[,1])) {
+        if(!any(tri[i,1] == dict)) {
+                tri[i, 1] <- "<UKN>"
+        }
+        if(!any(tri[i,2] == dict)) {
+                tri[i, 2] <- "<UKN>"
+        }
+        if(!any(tri[i,3] == dict)) {
+                tri[i, 3] <- "<UKN>"
+        }
+}
+write.csv(tri, "trigram_Unknown.csv", row.names = F )
+
+duo <- read.csv("duogram.csv", stringsAsFactors=FALSE)
+duo <- duo[,2:4]
+for (i in 1:length(duo[,1])) {
+        if(!any(duo[i,1] == dict)) {
+                duo[i, 1] <- "<UKN>"
+        }
+        if(!any(duo[i,2] == dict)) {
+                duo[i, 2] <- "<UKN>"
+        }
+}
+write.csv(duo, "duogram_Unknown.csv", row.names = F )
+
+uni <- read.csv("unigram.csv", stringsAsFactors=FALSE)
+uni <- uni[,2:3]
+for (i in 1:length(uni[,1])) {
+        if(!any(uni[i,1] == dict)) {
+                uni[i, 1] <- "<UKN>"
+        }
+        if(!any(uni[i,2] == dict)) {
+                uni[i, 2] <- "<UKN>"
+        }
+}
+write.csv(uni, "unigram_Unknown.csv", row.names = F )
+```
+
+Once the n-gram tables were changed to incorporate unknown words, the tables were combined to generate the specified n-grams. For example the first three words (first 3 columns) in the 3-gram table were collapsed into a single character separated by a single space and added as a column to the data tables.   
+
+```{r}
+tri$trigram <- paste(tri[,1], tri[,2], tri[,3], sep = " ")
+duo$duogram <- paste(duo[,1], duo[,2],  sep = " ")
+
+write.csv(tri, "trigram_Unknown.csv", row.names = F )
+write.csv(duo, "duogram_Unknown.csv", row.names = F )
+```
+
+```{r}
+Tri_results <- data.frame(NULL)
+trigrams <- unique(tri$trigram)
+for (i in 1:length(trigrams)){
+        sub <- tri[tri$trigram == trigrams[i],]
+        tab <- as.data.frame(table(sub))
+        if (nrow(tab) != 1) {tab <- tab[order(tab$Freq),]}
+        Tri_results[i, 1] <- trigrams[i]
+        Tri_results[i, 2] <- as.character(tab$outcome[1])
+}
+colnames(Tri_results) <- c("trigram", "outcome")
+write.csv(Tri_results, "trigram_final.csv", row.names = F )
+```
+
+```{r}
+duo_results <- data.frame(NULL)
+duograms <- unique(duo$duogram)
+for (i in 1:length(duograms)){
+        sub <- duo[duo$duogram == duograms[i],]
+        tab <- as.data.frame(table(sub))
+        if (nrow(tab) != 1) {tab <- tab[order(tab$Freq),]}
+        duo_results[i, 1] <- duograms[i]
+        duo_results[i, 2] <- as.character(tab$outcome[1])
+}
+colnames(duo_results) <- c("duogram", "outcome")
+write.csv(duo_results, "duogram_final.csv", row.names = F )
+```
+
+```{r}
+uni_results <- data.frame(NULL)
+unigrams <- unique(uni$var_one)
+for (i in 1:length(unigrams)){
+        sub <- uni[uni$var_one == unigrams[i],]
+        tab <- as.data.frame(table(sub))
+        if (nrow(tab) != 1) {tab <- tab[order(tab$Freq),]}
+        uni_results[i, 1] <- unigrams[i]
+        uni_results[i, 2] <- as.character(tab$outcome[1])
+}
+colnames(uni_results) <- c("unigram", "outcome")
+write.csv(uni_results, "unigram_final.csv", row.names = F )
+```
