@@ -8,7 +8,7 @@ shinyUI(pageWithSidebar(
         submitButton('Submit'),
         tags$div(class="header", checked=NA,
                  tags$p("For more details on how this app was developed check out the"),
-                 tags$a(href="http://.html", "presentation"))
+                 tags$a(href="http://rpubs.com/nab2000/DSCap", "presentation"))
     ),
     mainPanel(
             h3("Your Sentence:"),
